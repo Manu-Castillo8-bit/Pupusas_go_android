@@ -1,0 +1,23 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PupusasGo.App">
+    <Application.Styles>
+        <!-- Usar la versión correcta del tema Fluent -->
+        <FluentTheme />
+        
+        <!-- Estilos personalizados -->
+        <Style Selector="Button.cart-button">
+            <Setter Property="Background" Value="#6750A4"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style Selector="Button.cart-button:pointerover">
+            <Setter Property="Background" Value="#7F6BB0"/>
+        </Style>
+
+        <Style Selector="Button.cart-button:pressed">
+            <Setter Property="Background" Value="#584A8C"/>
+        </Style>
+    </Application.Styles>
+</Application>

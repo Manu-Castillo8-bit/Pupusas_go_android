@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="PupusasGo.Android/PupusasGo.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="PupusasGo.Browser/PupusasGo.Browser.csproj" />
+  <Project Path="PupusasGo.Desktop/PupusasGo.Desktop.csproj" />
+  <Project Path="PupusasGo.iOS/PupusasGo.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="PupusasGo/PupusasGo.csproj" />
+</Solution>
