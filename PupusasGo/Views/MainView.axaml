@@ -1,17 +1,300 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                xmlns:vm="using:PupusasGo.ViewModels"
-                mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-                x:Class="PupusasGo.Views.MainView"
-                x:DataType="vm:MainViewModel">
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PupusasGo"
+             x:Class="PupusasGo.MainView"
+             x:CompileBindings="False"
+             Background="#FCFCFC"
+             FontFamily="Segoe UI, sans-serif">
 
-    </Design.DataContext>
+    <UserControl.Resources>
+        <local:EqualsConverter x:Key="EqualsConverter" />
+        <local:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </UserControl.Resources>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid RowDefinitions="Auto, *, Auto">
+        
+        <!-- Barra superior con chips de categorías -->
+        <ItemsControl Grid.Row="0"
+                      ItemsSource="{Binding Categories}"
+                      Margin="16,8,16,0"
+                      Height="48">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="8"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ToggleButton Content="{Binding}"
+                                  IsChecked="{Binding $parent[ItemsControl].DataContext.SelectedCategory, Converter={StaticResource EqualsConverter}, ConverterParameter={Binding}}"
+                                  Classes="category-chip"
+                                  Margin="0,4">
+                        <ToggleButton.Styles>
+                            <Style Selector="ToggleButton.category-chip">
+                                <Setter Property="Background" Value="#E7E0EC"/>
+                                <Setter Property="Foreground" Value="#49454F"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Padding" Value="16,8"/>
+                                <Setter Property="CornerRadius" Value="20"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Style>
+                            <Style Selector="ToggleButton.category-chip:checked">
+                                <Setter Property="Background" Value="#6750A4"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Style>
+                        </ToggleButton.Styles>
+                    </ToggleButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Lista de pupusas con ScrollViewer -->
+        <ScrollViewer Grid.Row="1"
+                      Margin="16,8,16,0">
+            <ItemsControl ItemsSource="{Binding FilteredPupusas}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="8"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="#FFFFFF"
+                                BorderBrush="#79747E"
+                                BorderThickness="0.5"
+                                CornerRadius="12"
+                                Padding="16,12">
+                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding Emoji}"
+                                           FontSize="32"
+                                           Margin="0,0,12,0"
+                                           VerticalAlignment="Center"/>
+
+                                <StackPanel Grid.Column="1"
+                                            Spacing="4">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="16"
+                                               FontWeight="Bold"
+                                               Foreground="#1C1B1F"/>
+                                    <TextBlock Text="{Binding Description}"
+                                               FontSize="14"
+                                               Foreground="#49454F"/>
+                                    <TextBlock Text="{Binding Price, StringFormat='${0:F2}'}"
+                                               FontSize="16"
+                                               FontWeight="Bold"
+                                               Foreground="#6750A4"/>
+                                </StackPanel>
+
+                                <!-- Contador -->
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            Spacing="8"
+                                            VerticalAlignment="Center">
+                                    <Button Content="−"
+                                            Command="{Binding $parent[ItemsControl].DataContext.DecreaseQuantityCommand}"
+                                            CommandParameter="{Binding}"
+                                            Width="36"
+                                            Height="36"
+                                            CornerRadius="18"
+                                            FontSize="18"
+                                            FontWeight="Bold"
+                                            Background="#E7E0EC"
+                                            Foreground="#1C1B1F"
+                                            BorderThickness="0"/>
+                                            
+                                    <TextBlock Text="{Binding Quantity}"
+                                               FontSize="16"
+                                               Width="24"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#1C1B1F"/>
+
+                                    <Button Content="+"
+                                            Command="{Binding $parent[ItemsControl].DataContext.IncreaseQuantityCommand}"
+                                            CommandParameter="{Binding}"
+                                            Width="36"
+                                            Height="36"
+                                            CornerRadius="18"
+                                            FontSize="18"
+                                            FontWeight="Bold"
+                                            Background="#6750A4"
+                                            Foreground="#FFFFFF"
+                                            BorderThickness="0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Botón de carrito flotante -->
+        <Button Grid.Row="2"
+                Content="{Binding CartButtonText}"
+                Command="{Binding ShowCartCommand}"
+                Background="#6750A4"
+                Foreground="#FFFFFF"
+                Margin="16,8"
+                Padding="16,12"
+                CornerRadius="25"
+                FontWeight="Bold"
+                FontSize="16"
+                HorizontalAlignment="Stretch"
+                Classes="cart-button"/>
+
+        <!-- Panel del Carrito (Popup) -->
+        <Panel Grid.Row="0"
+               Grid.RowSpan="3"
+               IsVisible="{Binding ShowCart}"
+               Background="#80000000"
+               ZIndex="1000">
+            
+            <Border Background="#FFFFFF"
+                    CornerRadius="20"
+                    Margin="20"
+                    Padding="20"
+                    MaxHeight="700"
+                    VerticalAlignment="Center">
+                <ScrollViewer>
+                    <StackPanel Spacing="16">
+                        
+                        <!-- Header -->
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       Text="🛒 Tu Pedido"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       Foreground="#1C1B1F"/>
+                            <Button Grid.Column="1"
+                                    Content="✕"
+                                    Command="{Binding GoBackToMenuCommand}"
+                                    Background="Transparent"
+                                    Foreground="#49454F"
+                                    FontSize="20"
+                                    BorderThickness="0"
+                                    Padding="8"/>
+                        </Grid>
+
+                        <!-- Items del carrito -->
+                        <ItemsControl ItemsSource="{Binding CurrentOrder.Items}"
+                                      Margin="0,0,0,8">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,4"
+                                            Padding="12"
+                                            CornerRadius="8"
+                                            Background="#F5F5F5">
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Pupusa.Emoji}"
+                                                       FontSize="24"
+                                                       Margin="0,0,12,0"
+                                                       VerticalAlignment="Center"/>
+                                            <StackPanel Grid.Column="1"
+                                                        Spacing="2">
+                                                <TextBlock Text="{Binding Pupusa.Name}"
+                                                           FontSize="14"
+                                                           FontWeight="Bold"
+                                                           Foreground="#1C1B1F"/>
+                                                <TextBlock Text="{Binding Pupusa.Price, StringFormat='${0:F2} c/u'}"
+                                                           FontSize="12"
+                                                           Foreground="#49454F"/>
+                                                <TextBlock Text="{Binding Quantity, StringFormat='Cantidad: {0}'}"
+                                                           FontSize="12"
+                                                           Foreground="#6750A4"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding Subtotal, StringFormat='${0:F2}'}"
+                                                       FontSize="14"
+                                                       FontWeight="Bold"
+                                                       Foreground="#6750A4"
+                                                       VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Selector de entrega -->
+                        <RadioButton Content="🚚 Entrega a domicilio"
+                                     IsChecked="{Binding IsDelivery}"
+                                     Foreground="#1C1B1F"
+                                     Margin="0,4"/>
+                        <RadioButton Content="🏪 Retiro en local"
+                                     IsChecked="{Binding IsDelivery, Converter={StaticResource InverseBoolConverter}}"
+                                     Foreground="#1C1B1F"
+                                     Margin="0,0,0,8"/>
+
+                        <!-- Formulario -->
+                        <TextBox Watermark="Nombre *"
+                                 Text="{Binding CustomerName}"
+                                 Background="#F5F5F5"
+                                 Padding="12"
+                                 CornerRadius="8"
+                                 BorderThickness="0"/>
+                                 
+                        <TextBox Watermark="Teléfono *"
+                                 Text="{Binding Phone}"
+                                 Background="#F5F5F5"
+                                 Padding="12"
+                                 CornerRadius="8"
+                                 BorderThickness="0"/>
+                                 
+                        <TextBox Watermark="Dirección *"
+                                 Text="{Binding Address}"
+                                 IsVisible="{Binding IsAddressRequired}"
+                                 Background="#F5F5F5"
+                                 Padding="12"
+                                 CornerRadius="8"
+                                 BorderThickness="0"/>
+
+                        <ComboBox ItemsSource="{Binding PaymentMethods}"
+                                  SelectedItem="{Binding PaymentMethod}"
+                                  Background="#F5F5F5"
+                                  Padding="12"
+                                  CornerRadius="8"
+                                  BorderThickness="0"/>
+
+                        <!-- Resumen -->
+                        <Border Padding="16"
+                                CornerRadius="12"
+                                Background="#F5F5F5">
+                            <StackPanel Spacing="8">
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="Subtotal" Foreground="#1C1B1F"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='${0:F2}'}" Foreground="#1C1B1F"/>
+                                </Grid>
+                                <Grid ColumnDefinitions="*, Auto"
+                                      IsVisible="{Binding IsDelivery}">
+                                    <TextBlock Grid.Column="0" Text="Envío" Foreground="#1C1B1F"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Shipping, StringFormat='${0:F2}'}" Foreground="#1C1B1F"/>
+                                </Grid>
+                                <Rectangle Height="1" Fill="#79747E"/>
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <TextBlock Grid.Column="0" Text="Total" FontWeight="Bold" Foreground="#1C1B1F"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Total, StringFormat='${0:F2}'}" 
+                                               FontWeight="Bold"
+                                               Foreground="#6750A4"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Botón confirmar -->
+                        <Button Content="{Binding ConfirmButtonText}"
+                                Command="{Binding ConfirmOrderCommand}"
+                                Background="#6750A4"
+                                Foreground="#FFFFFF"
+                                Padding="16"
+                                CornerRadius="25"
+                                FontWeight="Bold"
+                                FontSize="16"
+                                HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Panel>
+    </Grid>
 </UserControl>
