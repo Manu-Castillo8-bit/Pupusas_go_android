@@ -16,11 +16,25 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Crear la ventana principal directamente
-            var mainWindow = new MainWindow();
+            var mainWindow = new Window
+            {
+                Title = "PupuGo",
+                Width = 400,
+                Height = 780,
+                MinWidth = 350,
+                MaxWidth = 450,
+                Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#FCFCFC")),
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Content = new MainView()
+            };
+
             desktop.MainWindow = mainWindow;
         }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            singleViewPlatform.MainView = new MainView();
+        }
 
-        base.OnFrameworkInitializationCompleted();  
+        base.OnFrameworkInitializationCompleted();
     }
 }

@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <local:EqualsConverter x:Key="EqualsConverter" />
         <local:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <local:NotNullConverter x:Key="NotNullConverter" />
     </UserControl.Resources>
 
     <Grid RowDefinitions="Auto, *, Auto">
@@ -105,7 +106,7 @@
                                             Foreground="#1C1B1F"
                                             BorderThickness="0"/>
                                             
-                                    <TextBlock Text="{Binding Quantity}"
+                                    <TextBlock Text="{Binding Quantity, Mode=OneWay}"
                                                FontSize="16"
                                                Width="24"
                                                HorizontalAlignment="Center"
@@ -228,13 +229,18 @@
                                      Foreground="#1C1B1F"
                                      Margin="0,0,0,8"/>
 
-                        <!-- Formulario -->
+                        <!-- Formulario con validación -->
                         <TextBox Watermark="Nombre *"
                                  Text="{Binding CustomerName}"
                                  Background="#F5F5F5"
                                  Padding="12"
                                  CornerRadius="8"
                                  BorderThickness="0"/>
+                        <TextBlock Text="{Binding NameError}" 
+                                   Foreground="#D32F2F" 
+                                   FontSize="12"
+                                   Margin="0,-5,0,5"
+                                   IsVisible="{Binding NameError, Converter={StaticResource NotNullConverter}}"/>
                                  
                         <TextBox Watermark="Teléfono *"
                                  Text="{Binding Phone}"
@@ -242,6 +248,11 @@
                                  Padding="12"
                                  CornerRadius="8"
                                  BorderThickness="0"/>
+                        <TextBlock Text="{Binding PhoneError}" 
+                                   Foreground="#D32F2F" 
+                                   FontSize="12"
+                                   Margin="0,-5,0,5"
+                                   IsVisible="{Binding PhoneError, Converter={StaticResource NotNullConverter}}"/>
                                  
                         <TextBox Watermark="Dirección *"
                                  Text="{Binding Address}"
@@ -250,9 +261,15 @@
                                  Padding="12"
                                  CornerRadius="8"
                                  BorderThickness="0"/>
+                        <TextBlock Text="{Binding AddressError}" 
+                                   Foreground="#D32F2F" 
+                                   FontSize="12"
+                                   Margin="0,-5,0,5"
+                                   IsVisible="{Binding AddressError, Converter={StaticResource NotNullConverter}}"/>
 
+                        <!-- Método de Pago -->
                         <ComboBox ItemsSource="{Binding PaymentMethods}"
-                                  SelectedItem="{Binding PaymentMethod}"
+                                  SelectedValue="{Binding PaymentMethod}"
                                   Background="#F5F5F5"
                                   Padding="12"
                                   CornerRadius="8"
@@ -291,7 +308,8 @@
                                 CornerRadius="25"
                                 FontWeight="Bold"
                                 FontSize="16"
-                                HorizontalAlignment="Stretch"/>
+                                HorizontalAlignment="Stretch"
+                                IsEnabled="{Binding CanConfirm}"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
